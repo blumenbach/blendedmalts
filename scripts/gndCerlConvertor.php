@@ -1,15 +1,11 @@
 <?php
     extract($_REQUEST);
-    //include("/blumenbach/wisski/sites/all/modules/wisski/js/header.php");
-    $user = "arnabbhattacharj";
-	$password = "12345678";
-	$hostname = "localhost";
-	//$user = "sanjeev";
-	//$password = "$olr4you";
-	$dbname = "SemBlumenbachDB1";
-	$dbname1 = "SemBlumenbachDB2";
-	$host_tomcat = "localhost";
-	$port = 8080;   
+    $user = "texthighlight";
+    $password = "texthighlightPWD122sdf";
+    $hostname = "localhost";
+    $dbname = "SemBlumenbachDB1";
+    $dbname1 = "SemBlumenbachDB2";
+
     // Connect the database.
     mysql_connect($hostname, $user, $password)
     or die("Unable to connect to SQL server");
