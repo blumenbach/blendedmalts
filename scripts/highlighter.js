@@ -90,29 +90,31 @@
                                             console.log(data);
                                             if (data.count != 0) {
                                                 var results = data.results.bindings;
-                                                var flag = true;
-                                                var langFlag = true;
-                                                jQuery170.each(results, function (index, value) {
-                                                    if (jQuery170(this.abstract).attr('xml:lang') == "de") {
-                                                        flag = false;
-                                                        langFlag = false;
+                                                if (results.length > 0) {
+                                                    var flag = true;
+                                                    var langFlag = true;
+                                                    jQuery170.each(results, function (index, value) {
+                                                        if (jQuery170(this.abstract).attr('xml:lang') == "de") {
+                                                            flag = false;
+                                                            langFlag = false;
+                                                            var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
+                                                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
+                                                            origin.tooltipster('content', display).data('ajax', 'cached');
+                                                            return false;
+                                                        }
+                                                    });
+
+                                                    if (flag) {
                                                         var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
                                                         var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
                                                         origin.tooltipster('content', display).data('ajax', 'cached');
-                                                        return false;
                                                     }
-                                                });
-
-                                                if (flag) {
-                                                    var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
-                                                    var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + items[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
-                                                    origin.tooltipster('content', display).data('ajax', 'cached');
-                                                }
-                                                if (langFlag) {
+                                                    if (langFlag) {
+                                                        origin.tooltipster('content', 'No Data Available');
+                                                    }
+                                                } else {
                                                     origin.tooltipster('content', 'No Data Available');
                                                 }
-                                            } else {
-                                                origin.tooltipster('content', 'No Data Available');
                                             }
                                         }
                                     });
