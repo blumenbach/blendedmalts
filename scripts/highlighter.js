@@ -70,8 +70,17 @@
                                         var n = cnp.lastIndexOf('/');
                                         var cnpNo = cnp.substring(n + 1);
                                         //console.log(cnpNo);
-                                        pipeUrl= "https://query.wikidata.org/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871+%22"+ cnpNo +"+%22.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22en%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22en%22%29+%0D%0A%7D+";
-										//curl https://query.wikidata.org/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0A%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fs+WHERE+%7B%0A++%3Fs+wdt%3AP1871+%22cnp01259920%22+.%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter(lang(%3Flabel)+%3D+%22en%22)+.%0A++%3Fs+schema%3Adescription+%3Fdesc+filter(lang(%3Fdesc)+%3D+%22en%22)+%0A%7D+ -X GET -H 'Accept: application/sparql-results+json'
+                                        var SERVICE = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
+                                        var query = encodeURI('PREFIX schema: <http://schema.org/>' +
+                                        'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
+                                        'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
+                                        'PREFIX wd: <http://www.wikidata.org/entity/>' +
+
+                                        'SELECT DISTINCT ?label ?desc ?s WHERE {' +
+                                        '?s wdt:P1871 ' + cnpNo +
+                                        '?s rdfs:label ?label filter(lang(?label) = "en") .' +
+                                        '?s schema:description ?desc filter(lang(?desc) = "en")}');
+                                        pipeUrl = SERVICE + '?query=' + query;
                                         ifPersonOrPlace = 1;
 
                                     }
@@ -136,7 +145,6 @@
 										jQuery170.ajax({
 											type: 'GET',
 											url: pipeUrl,
-                                            dataType: 'jsonp',
                                             headers: {
                                                 'Accept' : 'application/sparql-results+json'
                                             },
