@@ -136,6 +136,7 @@
 										jQuery170.ajax({
 											type: 'GET',
 											url: pipeUrl,
+                                            dataType: 'jsonp',
 											//async:   false,
 											success: function(data) {
 												if(tag == "PERSNAME")
