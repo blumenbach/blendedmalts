@@ -94,23 +94,17 @@
                                                     var flag = true;
                                                     var langFlag = true;
                                                     jQuery170.each(results, function (index, value) {
-                                                        if (jQuery170(this.abstract).attr('xml:lang') == "de") {
                                                             flag = false;
-                                                            langFlag = false;
-                                                            var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
-                                                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
+                                                            var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
+                                                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                                                             origin.tooltipster('content', display).data('ajax', 'cached');
                                                             return false;
-                                                        }
                                                     });
 
                                                     if (flag) {
-                                                        var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
-                                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
+                                                        var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
+                                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                                                         origin.tooltipster('content', display).data('ajax', 'cached');
-                                                    }
-                                                    if (langFlag) {
-                                                        origin.tooltipster('content', 'No Data Available');
                                                     }
                                                 } else {
                                                     origin.tooltipster('content', 'No Data Available');
