@@ -70,16 +70,9 @@
                                         var n = cnp.lastIndexOf('/');
                                         var cnpNo = cnp.substring(n + 1);
                                         //console.log(cnpNo);
-                                        jQuery170.ajax({
-                                            type: 'GET',
-                                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/gndCerlConvertor.php?ID=" + cnpNo,
-                                            async:   false,
-                                            success: function(data){
-                                                pipeUrl= "http://pipes.yahoo.com/pipes/pipe.run?GND="+data+"&_id=bcf8331faf8e40c5fe8d0095e7f5d524&_render=json";
-												//console.log(pipeUrl);
-                                            }
-											} );
-										ifPersonOrPlace = 1;
+                                        pipeUrl= "https://query.wikidata.org/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871"+ code +"%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22en%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22en%22%29+%0D%0A%7D+";
+										//curl https://query.wikidata.org/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0A%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fs+WHERE+%7B%0A++%3Fs+wdt%3AP1871+%22cnp01259920%22+.%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter(lang(%3Flabel)+%3D+%22en%22)+.%0A++%3Fs+schema%3Adescription+%3Fdesc+filter(lang(%3Fdesc)+%3D+%22en%22)+%0A%7D+ -X GET -H 'Accept: application/sparql-results+json'
+                                        ifPersonOrPlace = 1;
 
                                     }
                                     else if(tag == "PLACENAME")
