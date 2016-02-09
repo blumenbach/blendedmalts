@@ -15,14 +15,10 @@
 												jQuery170(this).css('font-weight','bold').addClass('tooltip');
 												
 										}
-										else 
+										else
 										{
-										//var c = jQuery(this).children().attr( "ref" );
-                                        if(jQuery(this).children().attr( "ref" ))
-											{
 											jQuery170(this).css('color', '#0000FF').addClass('tooltip');
 											jQuery170(this).css('font-weight','bold').addClass('tooltip');
-											} 
 										}
 									});
                                 },
@@ -75,7 +71,7 @@
                                             url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/gndCerlConvertor.php?ID=" + cnpNo,
                                             async:   false,
                                             success: function(data){
-                                                pipeUrl= "http://pipes.yahoo.com/pipes/pipe.run?GND="+data+"&_id=bcf8331faf8e40c5fe8d0095e7f5d524&_render=json";
+                                                pipeUrl= "http://pipes.yahoo.com/pipes/pipe.run?GND="+data+"&_id=176df80a84b5429f066e75e1017a4f4c&_render=json";
 												//console.log(pipeUrl);
                                             }
 											} );
@@ -92,23 +88,7 @@
                                     }
 									else if(tag == "TERM")
                                     {
-                                        ifPersonOrPlace = 0;
-                                        var c = jQuery(this).children().attr( "ref" );
-                                        if(c!=null)
-                                        {
-                                        var res = c.split(" ");
-                                        var display = new Array();
-										for (var i=0; i<res.length; i++)
-											{
-												res[i] = parseInt(res[i], 10);
-												display+=  importVar(res[i]);
-												display+= "<hr>";
-											}			
-											
-                                        origin.tooltipster('content',display).data('ajax','cached');    
-									    } 
-									    else
-									    {                                         
+                                        ifPersonOrPlace = 0;                                        
                                         jQuery170.ajax({
                                             type: 'GET',
                                             url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + jQuery170(this).text(),
@@ -135,7 +115,6 @@
                                                 console.log(error);
                                             }   
                                         } );
-									   }
                                      }
                                     
                                     if(ifPersonOrPlace)
@@ -157,8 +136,7 @@
 															 {
 																flag = false;
 																langFlag = false;
-																var imgsrc = '<img src="' + items[index].thumbnail + '" height="90" width="70" align="right"/>';
-																var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> "+items[index].title+"</span><br/><span> "+items[index].description+"</span></div>";                      
+																var display = "<div><span STYLE='font-size: 12pt'> "+items[index].title+"</span><br/><span> "+items[index].description+"</span></div>";                              
 																origin.tooltipster('content',display).data('ajax','cached');
 																return false;
 															 }
@@ -166,8 +144,7 @@
 
                                                      if(flag)
 														  {
-															  var imgsrc = '<img src="' + items[index].thumbnail + '" height="90" width="70" align="right"/>';
-															  var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> "+items[0].title+"</span><br/><span> "+items[0].description+"</span></div>";
+															  var display = "<div><span STYLE='font-size: 12pt'> "+items[0].title+"</span><br/><span> "+items[0].description+"</span></div>";
 															  origin.tooltipster('content',display).data('ajax','cached');
 														  }			
 												     if(langFlag)
@@ -177,7 +154,7 @@
                                                      }
 												     else
 													 {
-														  origin.tooltipster('content', 'No GND Data Available/Yahoo Pipes Error');
+														  origin.tooltipster('content', 'No Data Available');
 													 }
 												}
 									else if(tag == "PLACENAME")
@@ -223,6 +200,3 @@
                             }
                         });
                 });
-var importVar = function(key) {
-		return $.data(document.body, key);
-	};

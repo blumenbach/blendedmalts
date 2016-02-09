@@ -15,14 +15,10 @@
 												jQuery170(this).css('font-weight','bold').addClass('tooltip');
 												
 										}
-										else 
+										else
 										{
-										//var c = jQuery(this).children().attr( "ref" );
-                                        if(jQuery(this).children().attr( "ref" ))
-											{
 											jQuery170(this).css('color', '#0000FF').addClass('tooltip');
 											jQuery170(this).css('font-weight','bold').addClass('tooltip');
-											} 
 										}
 									});
                                 },
@@ -92,23 +88,7 @@
                                     }
 									else if(tag == "TERM")
                                     {
-                                        ifPersonOrPlace = 0;
-                                        var c = jQuery(this).children().attr( "ref" );
-                                        if(c!=null)
-                                        {
-                                        var res = c.split(" ");
-                                        var display = new Array();
-										for (var i=0; i<res.length; i++)
-											{
-												res[i] = parseInt(res[i], 10);
-												display+=  importVar(res[i]);
-												display+= "<hr>";
-											}			
-											
-                                        origin.tooltipster('content',display).data('ajax','cached');    
-									    } 
-									    else
-									    {                                         
+                                        ifPersonOrPlace = 0;                                        
                                         jQuery170.ajax({
                                             type: 'GET',
                                             url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + jQuery170(this).text(),
@@ -135,7 +115,6 @@
                                                 console.log(error);
                                             }   
                                         } );
-									   }
                                      }
                                     
                                     if(ifPersonOrPlace)
@@ -177,7 +156,7 @@
                                                      }
 												     else
 													 {
-														  origin.tooltipster('content', 'No GND Data Available/Yahoo Pipes Error');
+														  origin.tooltipster('content', 'No Data Available');
 													 }
 												}
 									else if(tag == "PLACENAME")
@@ -223,6 +202,3 @@
                             }
                         });
                 });
-var importVar = function(key) {
-		return $.data(document.body, key);
-	};
