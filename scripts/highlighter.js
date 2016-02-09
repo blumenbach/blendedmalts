@@ -148,6 +148,7 @@
                                             headers: {
                                                 'Accept' : 'application/sparql-results+json'
                                             },
+                                            dataType: 'jsonp',
 											//async:   false,
 											success: function(data) {
 												if(tag == "PERSNAME")
