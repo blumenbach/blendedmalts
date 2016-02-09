@@ -78,7 +78,7 @@
                                         '?s schema:description ?desc filter(lang(?desc) = "en")}');
                                     //pipeUrl = SERVICE + '?query=' + query;
 
-                                    pipeUrl = "PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871+%22" + cnpNo + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
+                                    pipeUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871+%22" + cnpNo + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
                                     jQuery170.ajax({
                                         type: 'GET',
                                         url: pipeUrl,
