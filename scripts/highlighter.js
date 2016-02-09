@@ -65,9 +65,8 @@
                                         cnp = jQuery170(this).find('persname').attr('ref');
                                     }
 
-                                    var n = cnp.lastIndexOf('/');
-                                    var cnpNo = cnp.substring(n + 1);
-                                    //console.log(cnpNo);
+                                    var cnpNo = cnp.substring(cnp.lastIndexOf('/') + 1);
+                                    console.log(cnpNo);
                                     var SERVICE = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
                                     var query = encodeURI('PREFIX schema: <http://schema.org/>' +
                                         'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
@@ -79,7 +78,7 @@
                                         '?s schema:description ?desc filter(lang(?desc) = "en")}');
                                     //pipeUrl = SERVICE + '?query=' + query;
 
-                                    pipeUrl = "https://query.wikidata.org/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871+%22" + cnpNo + "+%22.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D+";
+                                    pipeUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP1871+%22" + cnpNo + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
                                     jQuery170.ajax({
                                         type: 'GET',
                                         url: pipeUrl,
@@ -97,16 +96,16 @@
                                                     if (jQuery170(this.abstract).attr('xml:lang') == "de") {
                                                         flag = false;
                                                         langFlag = false;
-                                                        var imgsrc = '<img src="' + results[index].thumbnail + '" height="90" width="70" align="right"/>';
-                                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + items[index].title + "</span><br/><span> " + results[index].description + "</span></div>";
+                                                        var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
+                                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
                                                         origin.tooltipster('content', display).data('ajax', 'cached');
                                                         return false;
                                                     }
                                                 });
 
                                                 if (flag) {
-                                                    var imgsrc = '<img src="' + items[index].thumbnail + '" height="90" width="70" align="right"/>';
-                                                    var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + items[0].title + "</span><br/><span> " + items[0].description + "</span></div>";
+                                                    var imgsrc = '<img src="' + results[0].image + '" height="90" width="70" align="right"/>';
+                                                    var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + items[0].label + "</span><br/><span> " + results[0].desc + "</span></div>";
                                                     origin.tooltipster('content', display).data('ajax', 'cached');
                                                 }
                                                 if (langFlag) {
