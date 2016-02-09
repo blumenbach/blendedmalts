@@ -137,6 +137,9 @@
 											type: 'GET',
 											url: pipeUrl,
                                             dataType: 'jsonp',
+                                            headers: {
+                                                'Accept' : 'application/sparql-results+json'
+                                            },
 											//async:   false,
 											success: function(data) {
 												if(tag == "PERSNAME")
