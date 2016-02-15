@@ -192,5 +192,6 @@
                     });
                 });
 var importVar = function(key) {
-		return $.data(document.body, key);
+		var value = $.data(document.body, key);
+		return value[key];
 	};
