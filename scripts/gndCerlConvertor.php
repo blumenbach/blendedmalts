@@ -15,9 +15,10 @@
 
     $result = mysql_query($query) or die(mysql_error());
     $gnd = array();
-    
     while ($row = mysql_fetch_assoc($result)) {
-        echo json_encode((int)$row["GND"]);
+        if (isset($row)) {
+        	echo json_encode((int)$row["GND"]);
+	} 
     }
     
     //echo json_encode(gnd);
