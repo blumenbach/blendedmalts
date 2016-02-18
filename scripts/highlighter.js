@@ -1,220 +1,215 @@
-		jQuery170(window).load(function ($) {	
-					jQuery170.ajax({
-                        	type: 'GET',
-                                url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/checkTerms.php",
-                                async:   false,
-                                success: function(data){
-									jQuery170('term').each(function(index) 
-									{
-										var jsonString = JSON.stringify(data);
-										
-										
-										if (jsonString.indexOf(jQuery170(this).text()) > -1)
-										{
-												jQuery170(this).css('color','green').addClass('tooltip');
-												jQuery170(this).css('font-weight','bold').addClass('tooltip');
-												
-										}
-										else 
-										{
-										//var c = jQuery(this).children().attr( "ref" );
-                                        if(jQuery(this).children().attr( "ref" ))
-											{
-											jQuery170(this).css('color', '#0000FF').addClass('tooltip');
-											jQuery170(this).css('font-weight','bold').addClass('tooltip');
-											} 
-										}
-									});
-                                },
-                                error:function(error){
-                                	console.log('error from checkterms');
-                                } 
-                     });
+(function() {
 
-			        jQuery170('persName').css('color','#CC9900').addClass('tooltip');
-			        jQuery170('persName').css('font-weight','bold').addClass('tooltip');
-					jQuery170('persName').css('padding-right','5px');
-            		jQuery170('placeName').css('color','red').addClass('tooltip'); 
-            		jQuery170('placeName').css('font-weight','bold').addClass('tooltip');
+$().ready(function() {	
+    $.ajax({
+        type: 'GET',
+            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/checkTerms.php",
+            async:   false,
+            success: function(data){
+                $('term').each(function(index) {
+                    var jsonString = JSON.stringify(data);
 
-                    jQuery170.fn.ignore = function(sel){
-                            return this.clone().find(sel).remove().end();
-                    };
-                    jQuery170('.tooltip').tooltipster({
-                        content: 'Loading...',
-                        contentAsHTML: true,
-                        maxWidth: 1050,
-                        minWidth: 400,
-                        interactive: true,
-                        functionBefore: function (origin, continueTooltip) {
 
-                            // we'll make this function asynchronous and allow the tooltip to go ahead and show the loading notification while fetching our data
-                            continueTooltip();
+                    if (jsonString.indexOf($(this).text()) > -1) {
+                            $(this).css('color','green').addClass('tooltip');
+                            $(this).css('font-weight','bold').addClass('tooltip');
+                    } else {
+                    //var c = jQuery(this).children().attr( "ref" );
+                        if(jQuery(this).children().attr( "ref" )) {
+                            $(this).css('color', '#0000FF').addClass('tooltip');
+                            $(this).css('font-weight','bold').addClass('tooltip');
+                        }
+                    }
+                });
+            },
+            error:function(error){
+                console.log('error from checkterms');
+            }
+     });
 
-                            // next, we want to check if our data has already been cached
-                            if (origin.data('ajax') !== 'cached') {
-                                var pipeUrl = "";
-                                var tag = this.prop("tagName");
-                                var ifPersonOrPlace = 0;
+    $('persName').css('color','#CC9900').addClass('tooltip');
+    $('persName').css('font-weight','bold').addClass('tooltip');
+    $('persName').css('padding-right','5px');
+    $('placeName').css('color','red').addClass('tooltip'); 
+    $('placeName').css('font-weight','bold').addClass('tooltip');
 
-                                if (tag == "PERSNAME") {
-                                    var cnp = jQuery170(this).attr('ref');
-                                    if (cnp.indexOf('#') == 0) {
-                                        jQuery170(this).tooltipster('destroy');
-                                        cnp = jQuery170(this).find('persname').attr('ref');
-                                    }
+    $.fn.ignore = function(sel){
+            return this.clone().find(sel).remove().end();
+    };
 
-                                    var cnpNo = cnp.substring(cnp.lastIndexOf('/') + 1);
+    $('.tooltip').tooltipster({
+        content: 'Loading...',
+        contentAsHTML: true,
+        maxWidth: 1050,
+        minWidth: 400,
+        interactive: true,
+        functionBefore: function (origin, continueTooltip) {
+            continueTooltip();
 
-                                    function getGND(cnpNo) {  
-					return jQuery170.ajax({
-                                            type: 'GET',
-                                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/gndCerlConvertor.php?ID=" + cnpNo,
-                                            async:   false,
-                                            success: function(data){
-						return data;
-                                            }
-					}).responseText;
-				    }	
-				    var GND = getGND(cnpNo);					
-                                    var SERVICE = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
-                                    var query = encodeURI('PREFIX schema: <http://schema.org/>' +
-                                        'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
-                                        'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
-                                        'PREFIX wd: <http://www.wikidata.org/entity/>' +
-                                        'SELECT DISTINCT ?label ?desc ?s WHERE {' +
-                                        '?s wdt:P1871 ' + cnpNo +
-                                        '?s rdfs:label ?label filter(lang(?label) = "en") .' +
-                                        '?s schema:description ?desc filter(lang(?desc) = "en")}');
-                                    //pipeUrl = SERVICE + '?query=' + query;
+            if (origin.data('ajax') !== 'cached') {
+                var pipeUrl = "";
+                var tag = this.prop("tagName");
+                var ifPersonOrPlace = 0;
 
-                                    pipeUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP227+%22" + GND + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
-                                    jQuery170.ajax({
-                                        type: 'GET',
-                                        url: pipeUrl,
-                                        headers: {
-                                            'Accept': 'application/sparql-results+json'
-                                        },
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            if (data.count != 0) {
-                                                var results = data.results.bindings;
-                                                if (results.length > 0) {
-                                                    var flag = true;
-                                                    var langFlag = true;
-                                                    jQuery170.each(results, function (index, value) {
-                                                            flag = false;
-                                                            var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
-                                                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
-                                                            origin.tooltipster('content', display).data('ajax', 'cached');
-                                                            return false;
-                                                    });
+                if (tag == "PERSNAME") {
+                    var cnp = $(this).attr('ref');
+                    if (cnp.indexOf('#') == 0) {
+                        $(this).tooltipster('destroy');
+                        cnp = $(this).find('persname').attr('ref');
+                    }
 
-                                                    if (flag) {
-                                                        var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
-                                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
-                                                        origin.tooltipster('content', display).data('ajax', 'cached');
-                                                    }
-                                                } else {
-                                                    origin.tooltipster('content', 'No Data Available');
-                                                }
-                                            }
-                                        }
+                    var cnpNo = cnp.substring(cnp.lastIndexOf('/') + 1);
+
+                    function getGND(cnpNo) {  
+                        return $.ajax({
+                            type: 'GET',
+                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/gndCerlConvertor.php?ID=" + cnpNo,
+                            async:   false,
+                            success: function(data){
+                            return data;
+                            }
+                        }).responseText;
+                    }
+
+                    var GND = getGND(cnpNo);					
+                    var SERVICE = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
+                    var query = encodeURI('PREFIX schema: <http://schema.org/>' +
+                        'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
+                        'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
+                        'PREFIX wd: <http://www.wikidata.org/entity/>' +
+                        'SELECT DISTINCT ?label ?desc ?s WHERE {' +
+                        '?s wdt:P1871 ' + cnpNo +
+                        '?s rdfs:label ?label filter(lang(?label) = "en") .' +
+                        '?s schema:description ?desc filter(lang(?desc) = "en")}');
+                    //pipeUrl = SERVICE + '?query=' + query;
+
+                    pipeUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP227+%22" + GND + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
+                    $.ajax({
+                        type: 'GET',
+                        url: pipeUrl,
+                        headers: {
+                            'Accept': 'application/sparql-results+json'
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.count != 0) {
+                                var results = data.results.bindings;
+                                if (results.length > 0) {
+                                    var flag = true;
+                                    var langFlag = true;
+                                    $.each(results, function (index, value) {
+                                            flag = false;
+                                            var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
+                                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
+                                            origin.tooltipster('content', display).data('ajax', 'cached');
+                                            return false;
                                     });
-                                } else if (tag == "PLACENAME") {
-                                    var ref = jQuery170(this).attr("ref");
-                                    var code = ref.substring(ref.lastIndexOf('/') + 1);
-                                   // pipeUrl = "http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A++%3Fnote+rdf%3Avalue+%3Fdescription%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql";
-				pipeUrl ="http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++++OPTIONAL+%7B%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A%09%3Fnote+rdf%3Avalue+%3Fdescription%7D.++++%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql"
-				jQuery170.ajax({
-                                        type: 'GET',
-                                        url: pipeUrl,
-                                        dataType: 'json',
-                                        //async:   false,
-                                        success: function (data) {
-                                            if (data.count != 0) {
-                                                var results = data.results.bindings;
-                                                var flag = true;
-                                                if (results.length > 0) {
-                                                    var lang = results[0].description;
-                                                    jQuery170.each(results, function (index, value) {
-                                                        if (jQuery170(this.description).attr('xml:lang') == "de") {
-                                                            flag = false;
-                                                            var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>"
-							    var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
-							    var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
-							    var display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"	
-                                                            origin.tooltipster('content', display).data('ajax', 'cached');
 
-                                                        }
-                                                    });
-
-                                                    if (flag) {
-                                                        flag = true;
-							jQuery170.each(results, function (index, value) {
-							var display;	
-						     	var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>"
-                                                     	var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
-						    	if (results[0].description) {
-                                                            var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
-						    	} else {
-								description = ""
-						    	}		
-							display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
-							origin.tooltipster('content', display).data('ajax', 'cached');
-							});
-                                                } else {
-                                                    origin.tooltipster('content', 'No Data Available');
-                                                }
-                                            }
-                                            else {
-                                                origin.tooltipster('content', 'No Data Available');
-                                            }
-                                        }
-				    }		
-                                    });
-                                } else if (tag == "TERM") {
-                                    var c = jQuery(this).children().attr("ref");
-                                    if (c != null) {
-                                        var res = c.split(" ");
-                                        var display = new Array();
-                                        for (var i = 0; i < res.length; i++) {
-                                            res[i] = parseInt(res[i], 10);
-                                            display += importVar(res[i]);
-                                            display += "<hr>";
-                                        }
-
+                                    if (flag) {
+                                        var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
+                                        var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                                         origin.tooltipster('content', display).data('ajax', 'cached');
-                                    } else {
-                                        jQuery170.ajax({
-                                            type: 'GET',
-                                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + jQuery170(this).text(),
-                                            dataType: 'json',
-                                            success: function (data) {
-                                                if (data != null) {
-                                                    if (data.count != 0) {
-                                                        var display = "<div><span STYLE='font-size: 12pt'> " + data.name + "</span><br/><span> " + data.description + "</span><span><a style='color:blue' target=_blank href=" + data.link + "><img src='/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/external-link-16.png' align='right'></a></span></div>";
-                                                        origin.tooltipster('content', display).data('ajax', 'cached');
-                                                    }
-                                                    else {
-                                                        origin.tooltipster('content', 'No data available for this TERM');
-                                                    }
-                                                }
-                                                else {
-                                                    origin.tooltipster('content', 'No data available for this TERM');
-                                                }
-                                            },
-                                            error: function (error) {
-                                                console.log(error);
-                                            }
-                                        });
                                     }
+                                } else {
+                                    origin.tooltipster('content', 'No Data Available');
                                 }
                             }
                         }
                     });
-                });
+                } else if (tag == "PLACENAME") {
+                    var ref = $(this).attr("ref");
+                    var code = ref.substring(ref.lastIndexOf('/') + 1);
+                   // pipeUrl = "http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A++%3Fnote+rdf%3Avalue+%3Fdescription%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql";
+                    pipeUrl ="http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++++OPTIONAL+%7B%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A%09%3Fnote+rdf%3Avalue+%3Fdescription%7D.++++%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql"
+                    $.ajax({
+                        type: 'GET',
+                        url: pipeUrl,
+                        dataType: 'json',
+                        //async:   false,
+                        success: function (data) {
+                            if (data.count != 0) {
+                                var results = data.results.bindings;
+                                var flag = true;
+                                if (results.length > 0) {
+                                    var lang = results[0].description;
+                                    $.each(results, function (index, value) {
+                                        if ($(this.description).attr('xml:lang') == "de") {
+                                            flag = false;
+                                            var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
+                                            var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>";
+                                            var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
+                                            var display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>";
+                                            origin.tooltipster('content', display).data('ajax', 'cached');
+
+                                        }
+                                    });
+
+                                    if (flag) {
+                                        flag = true;
+                                        $.each(results, function (index, value) {
+                                        var display;
+                                            var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
+                                                                    var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
+                                            if (results[0].description) {
+                                                                        var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
+                                            } else {
+                                            description = ""
+                                            }
+                                        display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
+                                        origin.tooltipster('content', display).data('ajax', 'cached');
+                                        });
+                                    } else {
+                                        origin.tooltipster('content', 'No Data Available');
+                                    }
+                                } else {
+                                origin.tooltipster('content', 'No Data Available');
+                                }
+                            }
+                        }
+                    });
+                } else if (tag == "TERM") {
+                    var c = jQuery(this).children().attr("ref");
+                    if (c != null) {
+                        var res = c.split(" ");
+                        var display = [];
+                        for (var i = 0; i < res.length; i++) {
+                            res[i] = parseInt(res[i], 10);
+                            display += importVar(res[i]);
+                            display += "<hr>";
+                        }
+
+                        origin.tooltipster('content', display).data('ajax', 'cached');
+                    } else {
+                        $.ajax({
+                            type: 'GET',
+                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + $(this).text(),
+                            dataType: 'json',
+                            success: function (data) {
+                                if (data != null) {
+                                    if (data.count != 0) {
+                                        var display = "<div><span STYLE='font-size: 12pt'> " + data.name + "</span><br/><span> " + data.description + "</span><span><a style='color:blue' target=_blank href=" + data.link + "><img src='/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/external-link-16.png' align='right'></a></span></div>";
+                                        origin.tooltipster('content', display).data('ajax', 'cached');
+                                    }
+                                    else {
+                                        origin.tooltipster('content', 'No data available for this TERM');
+                                    }
+                                }
+                                else {
+                                    origin.tooltipster('content', 'No data available for this TERM');
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    });
+});
 var importVar = function(key) {
 		var value = $.data(document.body, key);
 		return value[key];
 	};
+})();
