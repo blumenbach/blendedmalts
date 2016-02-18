@@ -39,6 +39,7 @@ $().ready(function() {
 
     $('.tooltip').tooltipster({
         content: 'Loading...',
+	theme: 'tooltipster-light',
         contentAsHTML: true,
         maxWidth: 1050,
         minWidth: 400,
