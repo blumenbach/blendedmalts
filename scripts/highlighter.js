@@ -124,8 +124,9 @@
                                 } else if (tag == "PLACENAME") {
                                     var ref = jQuery170(this).attr("ref");
                                     var code = ref.substring(ref.lastIndexOf('/') + 1);
-                                    pipeUrl = "http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A++%3Fnote+rdf%3Avalue+%3Fdescription%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql";
-                                    jQuery170.ajax({
+                                   // pipeUrl = "http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A++%3Fnote+rdf%3Avalue+%3Fdescription%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql";
+				pipeUrl ="http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++++OPTIONAL+%7B%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A%09%3Fnote+rdf%3Avalue+%3Fdescription%7D.++++%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql"
+				jQuery170.ajax({
                                         type: 'GET',
                                         url: pipeUrl,
                                         dataType: 'json',
@@ -133,24 +134,36 @@
                                         success: function (data) {
                                             if (data.count != 0) {
                                                 var results = data.results.bindings;
+                                                var flag = true;
                                                 if (results.length > 0) {
-                                                    var flag = true;
                                                     var lang = results[0].description;
                                                     jQuery170.each(results, function (index, value) {
                                                         if (jQuery170(this.description).attr('xml:lang') == "de") {
                                                             flag = false;
-                                                            var display = "<div><span STYLE='font-size: 12pt'> " + utf8_decode(results[index].name.value) + " (" + utf8_decode(results[index].parentString.value) + ")</span><br/><span> " + utf8_decode(results[index].description.value) + "</span></div>";
+                                                            var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>"
+							    var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
+							    var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
+							    var display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"	
                                                             origin.tooltipster('content', display).data('ajax', 'cached');
+
                                                         }
                                                     });
 
                                                     if (flag) {
                                                         flag = true;
-                                                        var display = "<div><span STYLE='font-size: 12pt'> " + utf8_decode(results[0].name.value) + " (" + utf8_decode(results[0].parentString.value) + ")</span><br/><span> " + utf8_decode(results[0].description.value) + "</span></div>";
-                                                        origin.tooltipster('content', display).data('ajax', 'cached');
-                                                    }
-                                                }
-                                                else {
+							jQuery170.each(results, function (index, value) {
+							var display;	
+						     	var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>"
+                                                     	var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
+						    	if (results[0].description) {
+                                                            var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
+						    	} else {
+								description = ""
+						    	}		
+							display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
+							origin.tooltipster('content', display).data('ajax', 'cached');
+							});
+                                                } else {
                                                     origin.tooltipster('content', 'No Data Available');
                                                 }
                                             }
@@ -158,6 +171,7 @@
                                                 origin.tooltipster('content', 'No Data Available');
                                             }
                                         }
+				    }		
                                     });
                                 } else if (tag == "TERM") {
                                     var c = jQuery(this).children().attr("ref");
