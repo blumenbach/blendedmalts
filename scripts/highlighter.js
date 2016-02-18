@@ -80,7 +80,7 @@ $().ready(function() {
                         'PREFIX wd: <http://www.wikidata.org/entity/>' +
                         'SELECT DISTINCT ?label ?desc ?s ?image WHERE { ' +
                         '?s wdt:P227 "' + GND + '" .' +
-			'?s wdt:P18 ?image .' +
+			            '?s wdt:P18 ?image .' +
                         '?s rdfs:label ?label filter(lang(?label) = "en") .' +
                         '?s schema:description ?desc filter(lang(?desc) = "en")}').replace(/\(/g, "%28").replace(/\)/g, "%29");
                     pipeUrl = SERVICE + '?query=' + query;
@@ -120,8 +120,23 @@ $().ready(function() {
                 } else if (tag == "PLACENAME") {
                     var ref = $(this).attr("ref");
                     var code = ref.substring(ref.lastIndexOf('/') + 1);
-                   // pipeUrl = "http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A++%3Fnote+rdf%3Avalue+%3Fdescription%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql";
-                    pipeUrl ="http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++++OPTIONAL+%7B%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A%09%3Fnote+rdf%3Avalue+%3Fdescription%7D.++++%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql"
+                    SERVICE = 'http://vocab.getty.edu/sparql.json';
+                    query = encodeURIComponent('PREFIX gvp: <http://vocab.getty.edu/ontology#>' +
+                        'PREFIX dct: <http://purl.org/dc/elements/1.1/>' +
+                        'PREFIX xl: <http://www.w3.org/2008/05/skos-xl#>' +
+                        'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>' +
+                        'PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>' +
+                        'SELECT ?name ?parentString ?description WHERE {' +
+                        '?place dct:identifier "' +  code + '" .' +
+                        '?place xl:prefLabel ?nameLink .' +
+                        '?nameLink xl:literalForm ?name .' +
+                        '?place gvp:parentString ?parentString.' +
+                        'OPTIONAL {?place skos:scopeNote ?note .' +
+                        '?note rdf:value ?description}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+
+                    var TGNParams =    '&_implicit=false&implicit=true&_equivalent=false&_form=/sparql';
+                    pipeUrl = SERVICE + '?query=' + query + TGNParams;
+                    //pipeUrl ="http://vocab.getty.edu/sparql.json?query=PREFIX+gvp%3A+%3Chttp%3A%2F%2Fvocab.getty.edu%2Fontology%23%3E%0D%0APREFIX+dct%3A+%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Felements%2F1.1%2F%3E%0D%0APREFIX+xl%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2008%2F05%2Fskos-xl%23%3E%0D%0APREFIX+skos%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0D%0APREFIX+rdf%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0D%0ASELECT+%3Fname+%3FparentString+%3Fdescription%0D%0AWHERE+%7B%0D%0A++%3Fplace+dct%3Aidentifier+%22" + code + "%22.%0D%0A++%3Fplace+xl%3AprefLabel+%3FnameLink.%0D%0A++%3FnameLink+xl%3AliteralForm+%3Fname.%0D%0A++%3Fplace+gvp%3AparentString+%3FparentString.%0D%0A++++OPTIONAL+%7B%3Fplace+skos%3AscopeNote+%3Fnote.%0D%0A%09%3Fnote+rdf%3Avalue+%3Fdescription%7D.++++%0D%0A%7D&_implicit=false&implicit=true&_equivalent=false&_form=%2Fsparql"
                     $.ajax({
                         type: 'GET',
                         url: pipeUrl,
