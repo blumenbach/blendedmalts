@@ -185,25 +185,27 @@ $().ready(function() {
                     });
                 } else if (tag == "TERM") {
                     var c = $(this).children().attr("ref");
-                    function getdbpURI() {
+                    function getdbpURI(text) {
                         return $.ajax({
                             type: 'GET',
-                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + $(this).text(),
+                            url: "/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/fetchTermData.php?term=" + text,
                             async:   false,
                             success: function(data){
-                                return data.link;
+				console.log(data);
+                                return data;
                             }
                         }).responseText;
                     }
-                    var dbpURI = getdbpURI() || 0;
+		    var text = $(this).text();	
+                    var record = $.parseJSON(getdbpURI(text)) || 0;
+		    var resource = record["link"];	
                     SERVICE = 'http://de.dbpedia.org/sparql';
                     query = encodeURIComponent('PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>' +
                         'SELECT ?s ?label ?abstract ?image WHERE {' +
                         '?s rdfs:label ?label .' +
-                        'filter(lang(?label) ="@de")' +
                         '?s dbpedia-owl:abstract ?abstract .' +
-                        '?s dbpedia-owl:thumbnail ?image} .' +
-                        'VALUES ?s {' + dbpURI + '}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+                        'OPTIONAL {?s dbpedia-owl:thumbnail ?image} .' +
+                        'VALUES ?s {<' + resource + '>}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
                     pipeUrl = SERVICE + '?default-graph-uri=&query=' + query;
                     if (c != null) {
                         var res = c.split(" ");

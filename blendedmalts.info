@@ -23,7 +23,7 @@ stylesheets[all][]   = css/content.css
 stylesheets[all][]   = colorbox/example1/colorbox.css
 stylesheets[all][]   = slider/bjqs.css
 stylesheets[all][]   = css/tooltipster.css
-
+stylesheets[all][]   = css/tooltipster-light.css
 ; JS Scripts
 
 
