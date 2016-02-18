@@ -72,19 +72,19 @@ $().ready(function() {
                         }).responseText;
                     }
 
-                    var GND = getGND(cnpNo);					
+                    var GND = getGND(cnpNo) || 0;
                     var SERVICE = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
-                    var query = encodeURI('PREFIX schema: <http://schema.org/>' +
+                    var query = encodeURIComponent('PREFIX schema: <http://schema.org/>' +
                         'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
                         'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
                         'PREFIX wd: <http://www.wikidata.org/entity/>' +
-                        'SELECT DISTINCT ?label ?desc ?s WHERE {' +
-                        '?s wdt:P1871 ' + cnpNo +
+                        'SELECT DISTINCT ?label ?desc ?s ?image WHERE { ' +
+                        '?s wdt:P227 "' + GND + '" .' +
+			'?s wdt:P18 ?image .' +
                         '?s rdfs:label ?label filter(lang(?label) = "en") .' +
-                        '?s schema:description ?desc filter(lang(?desc) = "en")}');
-                    //pipeUrl = SERVICE + '?query=' + query;
+                        '?s schema:description ?desc filter(lang(?desc) = "en")}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+                    pipeUrl = SERVICE + '?query=' + query;
 
-                    pipeUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=PREFIX+schema%3A+%3Chttp%3A%2F%2Fschema.org%2F%3E%0D%0APREFIX+rdfs%3A+%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0D%0APREFIX+wdt%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fprop%2Fdirect%2F%3E%0D%0APREFIX+wd%3A+%3Chttp%3A%2F%2Fwww.wikidata.org%2Fentity%2F%3E%0D%0A%0D%0ASELECT+DISTINCT+%3Flabel+%3Fdesc+%3Fimage+%3Fs+WHERE+%7B%0D%0A++%3Fs+wdt%3AP227+%22" + GND + "%22.%0D%0A++%3Fs+wdt%3AP18+%3Fimage+.%0D%0A++%3Fs+rdfs%3Alabel+%3Flabel+filter%28lang%28%3Flabel%29+%3D+%22de%22%29+.%0D%0A++%3Fs+schema%3Adescription+%3Fdesc+filter%28lang%28%3Fdesc%29+%3D+%22de%22%29+%0D%0A%7D";
                     $.ajax({
                         type: 'GET',
                         url: pipeUrl,
