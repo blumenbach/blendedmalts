@@ -184,15 +184,15 @@ $().ready(function() {
                         }
                     });
                 } else if (tag == "TERM") {
-                    var c = jQuery(this).children().attr("ref");
+                    var c = $(this).children().attr("ref");
                     SERVICE = 'http://de.dbpedia.org/sparql';
                     query = encodeURIComponent('PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>' +
                         'SELECT ?s ?label ?abstract ?image WHERE {' +
                         '?s rdfs:label ?label .' +
                         'filter(?label="' + $(this).text() +'"@de)' +
                         '?s dbpedia-owl:abstract ?abstract .' +
-                        '?s dbpedia-owl:thumbnail ?image}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
-                    pipeUrl = SERVICE + '?' + query;
+                        '?s dbpedia-owl:thumbnail ?image}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+                    pipeUrl = SERVICE + '?default-graph-uri=&query=' + query;
                     if (c != null) {
                         var res = c.split(" ");
                         var display = [];
@@ -209,28 +209,29 @@ $().ready(function() {
                             url: pipeUrl,
                             dataType: 'json',
                             success: function (data) {
+				console.log(data);
                                 if (data.count != 0) {
                                     var results = data.results.bindings;
                                     var flag = true;
                                     if (results.length > 0) {
                                         var lang = results[0].description;
                                         $.each(results, function (index, value) {
-                                            var tooltipContent = '<table id="ttip_content">'
+                                            var display = '<table id="ttip_content">'
                                                 + '<tr>'
                                                 + '<td>'
                                                 + '<table>'
-                                                + '<tr><td>Name:</td><td>' + utf8_decode(results[index].name.value) + '</td></tr>';
-                                            tooltipContent += '<tr><td>URI:</td><td><a href="' + utf8_decode(results[index].s.value) + '" target="_blank">' + utf8_decode(results[index].s.value) + '</a></td></tr>';
-                                            tooltipContent += '</table></td>';
+                                                + '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>'
+						+ '<tr><td>Abstract:</td><td>' + results[index].abstract.value + '</td></tr>';
+                                            display += '<tr><td>URI:</td><td><a href="' + results[index].s.value + '" target="_blank">' + results[index].s.value + '</a></td></tr>';
+                                            display += '</table></td>';
                                             if (results[index].image != undefined || results[index].image != null) {
-                                                tooltipContent += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
+                                                display += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
                                             }
-                                            tooltipContent += '</tr>';
-                                            tooltipContent += '</table>';
+                                            display += '</tr>';
+                                            display += '</table>';
+					 origin.tooltipster('content', display).data('ajax', 'cached');
                                         });
                                         //var display = "<div><span STYLE='font-size: 12pt'> " + data.name + "</span><br/><span> " + data.description + "</span><span><a style='color:blue' target=_blank href=" + data.link + "><img src='/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/external-link-16.png' align='right'></a></span></div>";
-                                        origin.tooltipster('content', tooltipContent).data('ajax', 'cached');
-
                                     } else {
                                         origin.tooltipster('content', 'No data available for this TERM');
                                     }
