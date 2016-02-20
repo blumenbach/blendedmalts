@@ -50,7 +50,7 @@
         });
     }
 
-    function getPersonName(origin, pipeUrl) {
+    function getPersonName(origin, pipeUrl, cerlUrl) {
         return $.ajax({
             type: 'GET',
             url: pipeUrl,
@@ -59,32 +59,45 @@
             },
             dataType: 'json',
             success: function (data) {
-                    var results = data.results.bindings;
+                var results = data.results.bindings;
                     if (results.length > 0) {
                         $.each(results, function (index, value) {
                             var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
                             var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                             origin.tooltipster('content', display).data('ajax', 'cached');
-                            return false;
                         });
-                }
+	            } else {
+                        getPersonDatafromCERL(origin, cerlUrl);
+        	    }
             }
         });
     }
 
-    function getPersonDatafromCERL(data, origin, pipeUrl) {
-        if (!data) {
+    function getPersonDatafromCERL(origin, cerlUrl) {
             return $.ajax({
                 type: 'GET',
-                url: pipeUrl,
+                url: cerlUrl,
                 dataType: 'xml',
                 success: function (xml) {
                         console.log(xml);
+			$(xml).find("info").each(function(){
+			var name = $(this).find('display').text();
+			var biodata = $(this).find('biographicalData').text();
+			var activity = $(this).find('activityNote').text();
+			     var display = '<table id="ttip_content">'
+                             + '<tr>'
+                             + '<td>'
+                             + '<table>'
+                             + '<tr><td>Name:</td><td>' + name + '</td></tr>'
+			     + '<tr><td>Biography:</td><td>' + biodata + '</td></tr>'
+			     + '<tr><td>Occupation:</td><td>' + activity + '</td></tr>';
+                             display += '</table></td>';
+                             display += '</tr>';
+                            display += '</table>';
+			origin.tooltipster('content', display).data('ajax', 'cached');
+			});
                 }
             });
-        } else {
-            origin.tooltipster('content', 'No Data Available');
-        }
     }
 
     function getPlaceName(origin, pipeUrl) {
@@ -162,8 +175,7 @@
                             '?s schema:description ?desc filter(lang(?desc) = "en")}').replace(/\(/g, "%28").replace(/\)/g, "%29");
                         pipeUrl = SERVICE + '?query=' + query;
                         var cerlUrl = 'http://sru.cerl.org/thesaurus?version=1.1&operation=searchRetrieve&query=ct.identifier=' + cnpNo;
-
-                        getPersonName(origin, pipeUrl).then(getPersonDatafromCERL(data, origin, cerlUrl));
+                        getPersonName(origin, pipeUrl, cerlUrl);
 
                     } else if (tag == "PLACENAME") {
                         var ref = $(this).attr("ref");
