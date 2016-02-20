@@ -204,21 +204,23 @@ $().ready(function() {
                     if (record != 0) {
                         var wpid = encodeURIComponent(resource.substring(resource.lastIndexOf('/') + 1));
                         var wpuri = '<https://de.wikipedia.org/wiki/' + wpid + '>';
-                    }
 
                     SERVICE_WD = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
                     var wdquery = encodeURIComponent('PREFIX schema: <http://schema.org/>' +
                         'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
                         'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
                         'PREFIX wd: <http://www.wikidata.org/entity/>' +
-                        'SELECT ?o ?label ?desc ?image WHERE { ' +
+                        'SELECT ?o ?label ?desc ?image ?taxon WHERE { ' +
                         wpuri + ' schema:about ?o .' +
                         '?o rdfs:label ?label filter(lang(?label) = "de") .' +
-                        '?o schema:description ?desc filter(lang(?desc) = "en") .' +
+                        'OPTIONAL {?o schema:description ?desc filter(lang(?desc) = "en")} .' +
+			'OPTIONAL {?o wdt:P225 ?taxon} .' +
                         'OPTIONAL {?o wdt:P18 ?image}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
 
                     var wdqsUrl = SERVICE_WD + '?query=' + wdquery;
-
+		    } else {
+		    	wdqsUrl = null;
+		    }			
                     if (c != null) {
                         var res = c.split(" ");
                         var display = [];
@@ -229,6 +231,7 @@ $().ready(function() {
                         }
                         origin.tooltipster('content', display).data('ajax', 'cached');
                     } else {
+			if (wdqsUrl) {
                         $.ajax({
                             type: 'GET',
                             url: wdqsUrl,
@@ -244,9 +247,13 @@ $().ready(function() {
                                             + '<tr>'
                                             + '<td>'
                                             + '<table>'
-                                            + '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>'
-                                            + '<tr><td>Description:</td><td>' + results[index].desc.value + '</td></tr>';
-                                            + '<tr><td>Abstract:</td><td>' + record["abstract"] + '</td></tr>';
+                                            + '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>';
+					if (results[index].desc != undefined || results[index].desc != null) {
+                                            display += '<tr><td>Description:</td><td>' + results[index].desc.value + '</td></tr>';
+					}
+					if (results[index].taxon != undefined || results[index].taxon != null) {
+					   display +=  '<tr><td>Taxon:</td><td>' + results[index].taxon.value + '</td></tr>';
+					}
                                         display += '<tr><td>URI:</td><td><a href="' + results[index].o.value + '" target="_blank">' + results[index].o.value + '</a></td></tr>';
                                         display += '</table></td>';
                                         if (results[index].image != undefined || results[index].image != null) {
@@ -261,6 +268,9 @@ $().ready(function() {
                                 }
                             }
                         });
+			} else {
+			origin.tooltipster('content', 'No data available for this Term');
+			}
                     }
                 }
             }
