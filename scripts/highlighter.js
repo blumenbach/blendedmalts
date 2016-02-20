@@ -109,15 +109,18 @@
                 var flag = true;
                 if (results.length > 0) {
                     $.each(results, function (index, value) {
-                        var display;
-                        var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
-                        var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
+                        var display = '<table id="ttip_content">'
+                            + '<tr>'
+                            + '<td>'
+                            + '<table>'
+                            + '<tr><td>Name:</td><td>'+ utf8_decode(results[index].name.value) +'</td></tr>'
+                            + '<tr><td>Broader:</td><td>'  + utf8_decode(results[index].parentString.value) + '</td></tr>';
                         if (results[0].description) {
-                            var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
-                        } else {
-                            description = ""
+                            display += '<tr><td>Description:</td><td>' + utf8_decode(results[index].description.value) +'</td></tr>';
                         }
-                        display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
+                        display += '</table></td>';
+                        display += '</tr>';
+                        display += '</table>';
                         origin.tooltipster('content', display).data('ajax', 'cached');
                     });
                 } else {
@@ -290,7 +293,7 @@
                         	    origin.tooltipster('content', display).data('ajax', 'cached');
                         	} else {
                             	    origin.tooltipster('content', 'No data available for this Term');
-				}
+				            }
                         }
                     }
                 }
