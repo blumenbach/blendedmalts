@@ -198,16 +198,43 @@ $().ready(function() {
                     }
 		    var text = $(this).text();	
                     var record = $.parseJSON(getdbpURI(text)) || 0;
-		    var resource = record["link"];	
+		    var resource = record["link"];
+                    if (record != 0) {
+			var wpid = encodeURIComponent(resource.substring(resource.lastIndexOf('/') + 1));
+	               	var wpuri = '<https://de.wikipedia.org/wiki/' + wpid + '>';
+		        var ref = resource.indexOf('de');
+		    } else {
+		      ref = 0
+		    }	
                     SERVICE = 'http://de.dbpedia.org/sparql';
-                    query = encodeURIComponent('PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>' +
+		    SERVICE_EN = 'http://dbpedia.org/sparql';	
+		    SERVICE_WD = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql';
+
+                    query = encodeURIComponent('PREFIX dbo: <http://dbpedia.org/ontology/>' +
                         'SELECT ?s ?label ?abstract ?image WHERE {' +
                         '?s rdfs:label ?label .' +
-                        '?s dbpedia-owl:abstract ?abstract .' +
-                        'OPTIONAL {?s dbpedia-owl:thumbnail ?image} .' +
+                        '?s dbo:abstract ?abstract .' +
+                        'OPTIONAL {?s dbo:thumbnail ?image} .' +
                         'VALUES ?s {<' + resource + '>}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
-                    pipeUrl = SERVICE + '?default-graph-uri=&query=' + query;
-                    if (c != null) {
+		    
+                    var wdquery = encodeURIComponent('PREFIX schema: <http://schema.org/>' +
+                        'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
+                        'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
+                        'PREFIX wd: <http://www.wikidata.org/entity/>' +
+                        'SELECT ?o ?label ?desc ?image WHERE { ' +
+                         wpuri + ' schema:about ?o .' +
+                        '?o rdfs:label ?label filter(lang(?label) = "de") .' +
+                        '?o schema:description ?desc filter(lang(?desc) = "en") .' +
+                        'OPTIONAL {?o wdt:P18 ?image}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+
+		    if (ref > 0) {
+		    	pipeUrl = SERVICE + '?query=' + query;
+		    } else {
+		    	pipeUrl = SERVICE_EN + '?query=' + query;
+		    }
+                    var wdqsUrl = SERVICE_WD + '?query=' + wdquery;
+
+		    if (c != null) {
                         var res = c.split(" ");
                         var display = [];
                         for (var i = 0; i < res.length; i++) {
@@ -245,20 +272,46 @@ $().ready(function() {
                                             display += '</table>';
 					 origin.tooltipster('content', display).data('ajax', 'cached');
                                         });
-                                        //var display = "<div><span STYLE='font-size: 12pt'> " + data.name + "</span><br/><span> " + data.description + "</span><span><a style='color:blue' target=_blank href=" + data.link + "><img src='/blumenbach/wisski/sites/all/themes/blendedmalts/scripts/external-link-16.png' align='right'></a></span></div>";
-                                    } else {
-                                        origin.tooltipster('content', 'No data available for this TERM');
                                     }
-                                }
-                                else {
+				}
+			   }	
+			});
+			}
+			if (!display) {
+				 $.ajax({
+                            		type: 'GET',
+                            		url: wdqsUrl,
+                            		dataType: 'json',
+                            		success: function (data) {
+                                            console.log(data);
+                                	if (data.count != 0) {
+                                    		var results = data.results.bindings;
+                                    		var flag = true;
+                                    		if (results.length > 0) {
+                                        		var lang = results[0].description;
+                                        		$.each(results, function (index, value) {
+                                            		var display = '<table id="ttip_content">'
+                                                	+ '<tr>'
+                                                	+ '<td>'
+                                                	+ '<table>'
+                                                	+ '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>'
+                                                	+ '<tr><td>Abstract:</td><td>' + results[index].desc.value + '</td></tr>';
+                                            		display += '<tr><td>URI:</td><td><a href="' + results[index].o.value + '" target="_blank">' + results[index].o.value + '</a></td></tr>';
+                                            		display += '</table></td>';
+                                            		if (results[index].image != undefined || results[index].image != null) {
+                                                		display += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
+                                            		}
+                                            		display += '</tr>';
+                                            		display += '</table>';
+                                 	        origin.tooltipster('content', display).data('ajax', 'cached');
+                            		            	});
+						 }
+					}
+					}	
+                                    });
+                        } else {
                                     origin.tooltipster('content', 'No data available for this TERM');
-                                }
-                            },
-                            error: function (error) {
-                                console.log(error);
-                            }
-                        });
-                    }
+                        }
                 }
             }
         }
