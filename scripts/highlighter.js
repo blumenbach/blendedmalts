@@ -32,8 +32,6 @@
             success: function(data){
                 $('term').each(function(index) {
                     var jsonString = JSON.stringify(data);
-
-
                     if (jsonString.indexOf($(this).text()) > -1) {
                         $(this).css('color','green').addClass('tooltip');
                         $(this).css('font-weight','bold').addClass('tooltip');
@@ -52,7 +50,7 @@
         });
     }
 
-    function getPersonName(pipeUrl) {
+    function getPersonName(origin, pipeUrl) {
         return $.ajax({
             type: 'GET',
             url: pipeUrl,
@@ -61,27 +59,57 @@
             },
             dataType: 'json',
             success: function (data) {
-                if (data.count != 0) {
                     var results = data.results.bindings;
                     if (results.length > 0) {
-                        var flag = true;
-                        var langFlag = true;
                         $.each(results, function (index, value) {
-                            flag = false;
                             var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
                             var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                             origin.tooltipster('content', display).data('ajax', 'cached');
                             return false;
                         });
+                }
+            }
+        });
+    }
 
-                        if (flag) {
-                            var imgsrc = '<img src="' + results[0].image.value + '" height="90" width="70" align="right"/>';
-                            var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
-                            origin.tooltipster('content', display).data('ajax', 'cached');
+    function getPersonDatafromCERL(data, origin, pipeUrl) {
+        if (!data) {
+            return $.ajax({
+                type: 'GET',
+                url: pipeUrl,
+                dataType: 'xml',
+                success: function (xml) {
+                        console.log(xml);
+                }
+            });
+        } else {
+            origin.tooltipster('content', 'No Data Available');
+        }
+    }
+
+    function getPlaceName(origin, pipeUrl) {
+        return $.ajax({
+            type: 'GET',
+            url: pipeUrl,
+            dataType: 'json',
+            success: function (data) {
+                var results = data.results.bindings;
+                var flag = true;
+                if (results.length > 0) {
+                    $.each(results, function (index, value) {
+                        var display;
+                        var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
+                        var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
+                        if (results[0].description) {
+                            var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
+                        } else {
+                            description = ""
                         }
-                    } else {
-                        origin.tooltipster('content', 'No Data Available');
-                    }
+                        display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
+                        origin.tooltipster('content', display).data('ajax', 'cached');
+                    });
+                } else {
+                    origin.tooltipster('content', 'No Data Available');
                 }
             }
         });
@@ -112,8 +140,6 @@
                 if (origin.data('ajax') !== 'cached') {
                     var pipeUrl = "";
                     var tag = this.prop("tagName");
-                    var ifPersonOrPlace = 0;
-
                     if (tag == "PERSNAME") {
                         var cnp = $(this).attr('ref');
                         if (cnp.indexOf('#') == 0) {
@@ -135,8 +161,10 @@
                             '?s rdfs:label ?label filter(lang(?label) = "en") .' +
                             '?s schema:description ?desc filter(lang(?desc) = "en")}').replace(/\(/g, "%28").replace(/\)/g, "%29");
                         pipeUrl = SERVICE + '?query=' + query;
+                        var cerlUrl = 'http://sru.cerl.org/thesaurus?version=1.1&operation=searchRetrieve&query=ct.identifier=' + cnpNo;
 
-                        getPersonName(pipeUrl);
+                        getPersonName(origin, pipeUrl).then(getPersonDatafromCERL(data, origin, cerlUrl));
+
                     } else if (tag == "PLACENAME") {
                         var ref = $(this).attr("ref");
                         var code = ref.substring(ref.lastIndexOf('/') + 1);
@@ -156,52 +184,9 @@
 
                         var TGNParams = '&_implicit=false&implicit=true&_equivalent=false&_form=/sparql';
                         pipeUrl = SERVICE + '?query=' + query + TGNParams;
-                        $.ajax({
-                            type: 'GET',
-                            url: pipeUrl,
-                            dataType: 'json',
-                            //async:   false,
-                            success: function (data) {
-                                if (data.count != 0) {
-                                    var results = data.results.bindings;
-                                    var flag = true;
-                                    if (results.length > 0) {
-                                        var lang = results[0].description;
-                                        $.each(results, function (index, value) {
-                                            if ($(this.description).attr('xml:lang') == "de") {
-                                                flag = false;
-                                                var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
-                                                var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>";
-                                                var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
-                                                var display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>";
-                                                origin.tooltipster('content', display).data('ajax', 'cached');
 
-                                            }
-                                        });
+                        getPlaceName(origin, pipeUrl);
 
-                                        if (flag) {
-                                            flag = true;
-                                            $.each(results, function (index, value) {
-                                                var display;
-                                                var label = "<div class='form-item'><label>Label</label><ul><li> " + utf8_decode(results[index].name.value) + "</li></ul></div>";
-                                                var parentString = "<div class='form-item'><label>Parent</label><ul><li> (" + utf8_decode(results[index].parentString.value) + ")</li></ul></div>"
-                                                if (results[0].description) {
-                                                    var description = "<div class='form-item'><label>Description</label><ul><li> " + utf8_decode(results[index].description.value) + "</li></ul></div>";
-                                                } else {
-                                                    description = ""
-                                                }
-                                                display = "<div class='wisski_vocab_ctrl_infobox'>" + label + parentString + description + "</div>"
-                                                origin.tooltipster('content', display).data('ajax', 'cached');
-                                            });
-                                        } else {
-                                            origin.tooltipster('content', 'No Data Available');
-                                        }
-                                    } else {
-                                        origin.tooltipster('content', 'No Data Available');
-                                    }
-                                }
-                            }
-                        });
                     } else if (tag == "TERM") {
                         var c = $(this).children().attr("ref");
 
