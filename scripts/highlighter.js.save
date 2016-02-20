@@ -199,10 +199,10 @@ $().ready(function() {
 		    var text = $(this).text();	
                     var record = $.parseJSON(getdbpURI(text)) || 0;
 		    var resource = record["link"];
+		    var wpid = resource.substring(resource.lastIndexOf('/') + 1);
+	            var wpuri = '<https://de.wikipedia.org/wiki/' + wpid + '>';		
                     if (record != 0) {
-			var wpid = encodeURIComponent(resource.substring(resource.lastIndexOf('/') + 1));
-	               	var wpuri = '<https://de.wikipedia.org/wiki/' + wpid + '>';
-		        var ref = resource.indexOf('de');
+		      var ref = resource.indexOf('de');
 		    } else {
 		      ref = 0
 		    }	
@@ -221,11 +221,11 @@ $().ready(function() {
                         'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>' +
                         'PREFIX wdt: <http://www.wikidata.org/prop/direct/>' +
                         'PREFIX wd: <http://www.wikidata.org/entity/>' +
-                        'SELECT ?o ?label ?desc ?image WHERE { ' +
-                         wpuri + ' schema:about ?o .' +
+                        'SELECT DISTINCT ?o ?label ?desc ?image WHERE { ' +
+                         wpuri + '?p ?o .' +
                         '?o rdfs:label ?label filter(lang(?label) = "de") .' +
                         '?o schema:description ?desc filter(lang(?desc) = "en") .' +
-                        'OPTIONAL {?o wdt:P18 ?image}}').replace(/\(/g, "%28").replace(/\)/g, "%29");
+                        '?o wdt:P18 ?image}').replace(/\(/g, "%28").replace(/\)/g, "%29");
 
 		    if (ref > 0) {
 		    	pipeUrl = SERVICE + '?query=' + query;
@@ -251,6 +251,7 @@ $().ready(function() {
                             dataType: 'json',
                             success: function (data) {
 				            console.log(data);
+                                if (data.count != 0) {
                                     var results = data.results.bindings;
                                     var flag = true;
                                     if (results.length > 0) {
@@ -271,19 +272,17 @@ $().ready(function() {
                                             display += '</table>';
 					 origin.tooltipster('content', display).data('ajax', 'cached');
                                         });
-                                 } else {
-                                            origin.tooltipster('content', 'No data available for this Term');
-				}				
-			   }	
-			});
-			}
-			if (!display) {
+                                    }
+				}
+			     
+}	
 				 $.ajax({
                             		type: 'GET',
                             		url: wdqsUrl,
                             		dataType: 'json',
                             		success: function (data) {
                                             console.log(data);
+                                	if (data.count != 0) {
                                     		var results = data.results.bindings;
                                     		var flag = true;
                                     		if (results.length > 0) {
@@ -294,8 +293,8 @@ $().ready(function() {
                                                 	+ '<td>'
                                                 	+ '<table>'
                                                 	+ '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>'
-                                                	+ '<tr><td>Abstract:</td><td>' + results[index].desc.value + '</td></tr>';
-                                            		display += '<tr><td>URI:</td><td><a href="' + results[index].o.value + '" target="_blank">' + results[index].o.value + '</a></td></tr>';
+                                                	+ '<tr><td>Abstract:</td><td>' + results[index].abstract.value + '</td></tr>';
+                                            		display += '<tr><td>URI:</td><td><a href="' + results[index].s.value + '" target="_blank">' + results[index].s.value + '</a></td></tr>';
                                             		display += '</table></td>';
                                             		if (results[index].image != undefined || results[index].image != null) {
                                                 		display += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
@@ -303,15 +302,21 @@ $().ready(function() {
                                             		display += '</tr>';
                                             		display += '</table>';
                                  	        origin.tooltipster('content', display).data('ajax', 'cached');
-                            		            	});
-			                        } else {
-        	        	                    origin.tooltipster('content', 'No data available for this Term');
-                	        		}
+                                        	});
+					 }
+					}
 					}	
                                     });
-                        } else {
-                                    origin.tooltipster('content', 'No data available for this Term');
-                        }
+				}
+                                } else {
+                                    origin.tooltipster('content', 'No data available for this TERM');
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    }
                 }
             }
         }
