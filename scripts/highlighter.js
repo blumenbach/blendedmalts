@@ -66,9 +66,9 @@
                             var display = "<div>" + imgsrc + "<span STYLE='font-size: 12pt'> " + results[0].label.value + "</span><br/><span> " + results[0].desc.value + "</span></div>";
                             origin.tooltipster('content', display).data('ajax', 'cached');
                         });
-	            } else {
+                    } else {
                         getPersonDatafromCERL(origin, cerlUrl);
-        	    }
+                    }
             }
         });
     }
@@ -79,23 +79,22 @@
                 url: cerlUrl,
                 dataType: 'xml',
                 success: function (xml) {
-                        console.log(xml);
-			$(xml).find("info").each(function(){
-			var name = $(this).find('display').text();
-			var biodata = $(this).find('biographicalData').text();
-			var activity = $(this).find('activityNote').text();
-			     var display = '<table id="ttip_content">'
-                             + '<tr>'
-                             + '<td>'
-                             + '<table>'
-                             + '<tr><td>Name:</td><td>' + name + '</td></tr>'
-			     + '<tr><td>Biography:</td><td>' + biodata + '</td></tr>'
-			     + '<tr><td>Occupation:</td><td>' + activity + '</td></tr>';
+                    $(xml).find("info").each(function(){
+                        var name = $(this).find('display').text();
+                        var biodata = $(this).find('biographicalData').text();
+                        var activity = $(this).find('activityNote').text();
+                        var display = '<table id="ttip_content">'
+                                     + '<tr>'
+                                     + '<td>'
+                                     + '<table>'
+                                     + '<tr><td>Name:</td><td>' + name + '</td></tr>'
+                                     + '<tr><td>Biography:</td><td>' + biodata + '</td></tr>'
+                                     + '<tr><td>Occupation:</td><td>' + activity + '</td></tr>';
                              display += '</table></td>';
                              display += '</tr>';
-                            display += '</table>';
-			origin.tooltipster('content', display).data('ajax', 'cached');
-			});
+                             display += '</table>';
+                        origin.tooltipster('content', display).data('ajax', 'cached');
+                    });
                 }
             });
     }
@@ -127,14 +126,74 @@
             }
         });
     }
+
+    function getTerm(origin, wdqsUrl) {
+        return $.ajax({
+            type: 'GET',
+            url: wdqsUrl,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                var results = data.results.bindings;
+                var flag = true;
+                if (results.length > 0) {
+                    var lang = results[0].description;
+                    $.each(results, function (index, value) {
+                        var display = '<table id="ttip_content">'
+                            + '<tr>'
+                            + '<td>'
+                            + '<table>'
+                            + '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>';
+                        if (results[index].desc != undefined || results[index].desc != null) {
+                            display += '<tr><td>Description:</td><td>' + results[index].desc.value + '</td></tr>';
+                        }
+                        if (results[index].taxon != undefined || results[index].taxon != null) {
+                            display +=  '<tr><td>Taxon:</td><td>' + results[index].taxon.value + '</td></tr>';
+                        }
+                        display += '<tr><td>URI:</td><td><a href="' + results[index].o.value + '" target="_blank">' + results[index].o.value + '</a></td></tr>';
+                        display += '</table></td>';
+                        if (results[index].image != undefined || results[index].image != null) {
+                            display += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
+                        }
+                        display += '</tr>';
+                        display += '</table>';
+                        origin.tooltipster('content', display).data('ajax', 'cached');
+                    });
+                } else {
+                    origin.tooltipster('content', 'No data available for this Term');
+                }
+            }
+        });
+    }
+
+    function getObjects() {
+        var importVar = function(key) {
+            var value = $.data(document.body, key);
+            return value[key];
+        };
+        var c = $(this).children().attr("ref");
+        if (c != null) {
+            var res = c.split(" ");
+            var display = [];
+            for (var i = 0; i < res.length; i++) {
+                res[i] = parseInt(res[i], 10);
+                var val = importVar(res[i]);
+                if (!val) {
+                    return;
+                } else {
+                    display += val;
+                    display += "<hr>";
+                }
+            }
+        }
+        return display;
+    }
+
     $().ready(function() {
         checkTerms();
 
-        $('persName').css('color','#CC9900').addClass('tooltip');
-        $('persName').css('font-weight','bold').addClass('tooltip');
-        $('persName').css('padding-right','5px');
-        $('placeName').css('color','red').addClass('tooltip');
-        $('placeName').css('font-weight','bold').addClass('tooltip');
+        $('persName').css({'color':'#CC9900','font-weight':'bold','padding-right':'5px'}).addClass('tooltip');
+        $('placeName').css({'color':'red', 'font-weight':'bold'}).addClass('tooltip');
 
         $.fn.ignore = function(sel){
                 return this.clone().find(sel).remove().end();
@@ -200,8 +259,10 @@
                         getPlaceName(origin, pipeUrl);
 
                     } else if (tag == "TERM") {
-                        var c = $(this).children().attr("ref");
-
+                        var objects = getObjects();
+                        if (objects) {
+                            origin.tooltipster('content', display).data('ajax', 'cached');
+                        }
                         var text = $(this).text();
                         var record = $.parseJSON(getdbpURI(text)) || 0;
                         var resource = record["link"];
@@ -225,64 +286,14 @@
                             wdqsUrl = null;
                         }
 
-                        if (c != null) {
-                            var res = c.split(" ");
-                            var display = [];
-                            for (var i = 0; i < res.length; i++) {
-                                res[i] = parseInt(res[i], 10);
-                                display += importVar(res[i]);
-                                display += "<hr>";
-                            }
-                            origin.tooltipster('content', display).data('ajax', 'cached');
+                        if (wdqsUrl) {
+                           getTerm(origin, wdqsUrl) ;
                         } else {
-                            if (wdqsUrl) {
-                                $.ajax({
-                                    type: 'GET',
-                                    url: wdqsUrl,
-                                    dataType: 'json',
-                                    success: function (data) {
-                                        console.log(data);
-                                        var results = data.results.bindings;
-                                        var flag = true;
-                                        if (results.length > 0) {
-                                            var lang = results[0].description;
-                                            $.each(results, function (index, value) {
-                                                var display = '<table id="ttip_content">'
-                                                + '<tr>'
-                                                + '<td>'
-                                                + '<table>'
-                                                + '<tr><td>Name:</td><td>' + results[index].label.value + '</td></tr>';
-                                                if (results[index].desc != undefined || results[index].desc != null) {
-                                                                        display += '<tr><td>Description:</td><td>' + results[index].desc.value + '</td></tr>';
-                                                }
-                                                if (results[index].taxon != undefined || results[index].taxon != null) {
-                                                   display +=  '<tr><td>Taxon:</td><td>' + results[index].taxon.value + '</td></tr>';
-                                                }
-                                                display += '<tr><td>URI:</td><td><a href="' + results[index].o.value + '" target="_blank">' + results[index].o.value + '</a></td></tr>';
-                                                display += '</table></td>';
-                                                if (results[index].image != undefined || results[index].image != null) {
-                                                    display += '<td><div style="width:125px;height:125px;"><img style="width:125px;height:auto;" src="' + results[index].image.value + '"/></div></td>';
-                                                }
-                                                display += '</tr>';
-                                                display += '</table>';
-                                                origin.tooltipster('content', display).data('ajax', 'cached');
-                                            });
-                                        } else {
-                                            origin.tooltipster('content', 'No data available for this Term');
-                                        }
-                                    }
-                                });
-                            } else {
-                                origin.tooltipster('content', 'No data available for this Term');
-                            }
+                            origin.tooltipster('content', 'No data available for this Term');
                         }
                     }
                 }
             }
         });
     });
-    var importVar = function(key) {
-            var value = $.data(document.body, key);
-            return value[key];
-        };
 }() );
